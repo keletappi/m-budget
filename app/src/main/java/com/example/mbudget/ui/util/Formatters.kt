@@ -17,7 +17,7 @@ fun Amount.formattedAsCurrency(): String {
 }
 
 fun Amount.formattedAsDigit(): String {
-    val format: NumberFormat = DecimalFormat("0.00#",)
+    val format: NumberFormat = DecimalFormat("0.00#")
     return format.format(amount)
 }
 
@@ -33,4 +33,3 @@ fun Temporal.localTimeFormatted(): String {
     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         .format(this)
 }
-

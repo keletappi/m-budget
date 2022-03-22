@@ -13,14 +13,14 @@ import javax.inject.Inject
 
 class BudgetRepository @Inject constructor(private val dao: BudgetDao) {
 
-    fun getBudgets(): Flow<List<Budget>> = dao.observeBudgets().map {
-        it.map {
-            it.toLocalModel()
+    fun getBudgets(): Flow<List<Budget>> = dao.observeBudgets().map { budgets ->
+        budgets.map { budget ->
+            budget.toLocalModel()
         }
     }
 
-    fun getBudget(id: UUID): Flow<Budget> = dao.observeBudget(id).map {
-        it.toLocalModel()
+    fun getBudget(id: UUID): Flow<Budget> = dao.observeBudget(id).map { budget ->
+        budget.toLocalModel()
     }
 
     suspend fun insertBudget(budget: Budget) {
