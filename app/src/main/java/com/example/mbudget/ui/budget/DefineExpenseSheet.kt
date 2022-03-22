@@ -107,7 +107,7 @@ private fun NameInput(
     TextField(
         modifier = Modifier.fillMaxWidth(),
         value = name,
-        placeholder = { Text(text = stringResource(R.string.expense_name_placeholder)) },
+        placeholder = { Text(text = stringResource(R.string.create_expense_name_placeholder)) },
         onValueChange = setName,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,

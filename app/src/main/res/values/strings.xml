@@ -6,7 +6,8 @@
     <string name="create_budget_limit_placeholder">Budgeted amount</string>
     <string name="create_budget_name_placeholder">Give the budget a name</string>
     <string name="button_label_create_budget">Save m\'budget</string>
-    <string name="expense_name_placeholder">What is this expense?</string>
+    <string name="create_expense_name_placeholder">What is this?</string>
+    <string name="create_expense_amount_placeholder">And how expensive?</string>
     <string name="error_expense_amount_not_numeric">Amount really needs to be a number.</string>
     <string name="button_label_save_expense">Save m\'expense</string>
 </resources>

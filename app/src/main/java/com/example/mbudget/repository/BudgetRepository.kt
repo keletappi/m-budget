@@ -1,26 +1,43 @@
 package com.example.mbudget.repository
 
 import com.example.mbudget.db.BudgetDao
-import com.example.mbudget.model.Budget
 import com.example.mbudget.db.model.BudgetWithExpenses
 import com.example.mbudget.db.model.DbBudget
 import com.example.mbudget.db.model.DbExpense
+import com.example.mbudget.model.Budget
 import com.example.mbudget.model.Expense
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDateTime
+import java.time.YearMonth
+import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
 
 class BudgetRepository @Inject constructor(private val dao: BudgetDao) {
 
-    fun getBudgets(): Flow<List<Budget>> = dao.observeBudgets().map { budgets ->
+    fun getBudgetsForCurrentMonth(): Flow<List<Budget>> = dao.observeBudgets().map { budgets ->
         budgets.map { budget ->
-            budget.toLocalModel()
+            budget
+                .copy(expenses = budget.expenses.filter { containedInYearMonth(YearMonth.now(), it) })
+                .toLocalModel()
         }
     }
 
-    fun getBudget(id: UUID): Flow<Budget> = dao.observeBudget(id).map { budget ->
-        budget.toLocalModel()
+    fun getBudget(id: UUID, month: YearMonth): Flow<Budget> = dao.observeBudget(id).map { budget ->
+        budget
+            .copy(expenses = budget.expenses.filter { containedInYearMonth(month, it) })
+            .toLocalModel()
+    }
+
+    // TODO: Query expenses by month already in DB.
+    @Deprecated("Move this filtering to be done in DB. It is wasteful to query all & filter in app code.")
+    private fun containedInYearMonth(yearMonth: YearMonth, it: DbExpense): Boolean {
+        val timezone = ZoneId.systemDefault()
+        val start = yearMonth.atDay(1).atStartOfDay()
+        val end = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay()
+        val localTimestamp = LocalDateTime.ofInstant(it.time, timezone)
+        return localTimestamp.isAfter(start) && localTimestamp.isBefore(end)
     }
 
     suspend fun insertBudget(budget: Budget) {
@@ -46,7 +63,6 @@ class BudgetRepository @Inject constructor(private val dao: BudgetDao) {
             )
         )
     }
-
 }
 
 private fun BudgetWithExpenses.toLocalModel(): Budget {

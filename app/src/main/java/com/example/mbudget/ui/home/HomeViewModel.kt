@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
     private val repository: BudgetRepository
 ) : ViewModel() {
 
-    val budgets: LiveData<List<Budget>> = repository.getBudgets().asLiveData()
+    val budgets: LiveData<List<Budget>> = repository.getBudgetsForCurrentMonth().asLiveData()
 
     fun createBudget(createBudget: CreateBudgetInfo) {
         viewModelScope.launch {

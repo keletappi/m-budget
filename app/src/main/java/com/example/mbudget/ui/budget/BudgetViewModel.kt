@@ -6,6 +6,7 @@ import com.example.mbudget.model.Expense
 import com.example.mbudget.repository.BudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.YearMonth
 import java.util.*
 import javax.inject.Inject
 
@@ -17,9 +18,15 @@ class BudgetViewModel @Inject constructor(
 
     val budgetId: UUID = UUID.fromString(savedStateHandle["budgetId"])
 
-    val budget: LiveData<Budget> = repository.getBudget(budgetId).asLiveData().map { budget ->
-        budget.copy(expenses = budget.expenses.sortedBy { expense -> expense.time })
-    }
+    // TODO: Make month selectable
+    @Suppress("MemberVisibilityCanBePrivate")
+    val month = MutableLiveData(YearMonth.now())
+
+    val budget: LiveData<Budget> = month.switchMap { selectedMonth ->
+            repository.getBudget(budgetId, selectedMonth).asLiveData().map { budget ->
+                budget.copy(expenses = budget.expenses.sortedBy { expense -> expense.time })
+            }
+        }
 
     fun saveExpense(expense: Expense) {
         viewModelScope.launch {

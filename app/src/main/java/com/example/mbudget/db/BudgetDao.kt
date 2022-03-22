@@ -16,8 +16,11 @@ interface BudgetDao {
     @Query("SELECT * FROM DbBudget")
     fun observeBudgets(): Flow<List<BudgetWithExpenses>>
 
-    @Query("SELECT * FROM DbBudget WHERE budgetId = :id")
-    fun observeBudget(id: UUID): Flow<BudgetWithExpenses>
+    @Query("SELECT * FROM DbBudget WHERE budgetId = :budgetId")
+    fun observeBudget(budgetId: UUID): Flow<BudgetWithExpenses>
+
+    @Query("SELECT * FROM DbExpense where budgetId = :budgetId")
+    fun observeExpenses(budgetId: UUID): Flow<List<DbExpense>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateBudget(budget: DbBudget)
