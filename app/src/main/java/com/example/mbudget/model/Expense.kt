@@ -1,7 +1,12 @@
 package com.example.mbudget.model
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import java.lang.IllegalStateException
 import java.time.Instant
+import java.util.*
 
 // TODO: Consider externalizing exchange rates.
 // Having the rate in the expense means that moving an expense from one budget to another
@@ -9,8 +14,9 @@ import java.time.Instant
 data class Expense(
     val name: String,
     val amount: Amount,
-    val time: Instant,
+    val time: Instant = Instant.now(),
     val exchangeRate: ExchangeRate? = null,
+    val expenseId: UUID = UUID.randomUUID(), // CAVEAT: No collision detection!
 ) {
     fun amountIn(currency: Currency): Amount {
         if (currency == amount.currency) return amount

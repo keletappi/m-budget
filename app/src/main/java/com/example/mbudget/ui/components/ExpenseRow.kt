@@ -1,4 +1,4 @@
-package com.example.mbudget.ui
+package com.example.mbudget.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,10 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mbudget.model.*
-import com.example.mbudget.ui.ExpenseRowSemantics.TestTag.AMOUNT_BUDGET_CURRENCY
-import com.example.mbudget.ui.ExpenseRowSemantics.TestTag.AMOUNT_ORIGINAL_CURRENCY
-import com.example.mbudget.ui.ExpenseRowSemantics.TestTag.NAME
-import com.example.mbudget.ui.ExpenseRowSemantics.TestTag.TIME
+import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.AMOUNT_BUDGET_CURRENCY
+import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.AMOUNT_ORIGINAL_CURRENCY
+import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.NAME
+import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.TIME
 import com.example.mbudget.ui.util.formatted
 import com.example.mbudget.ui.util.localTimeFormatted
 import java.time.Instant

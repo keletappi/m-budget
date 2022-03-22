@@ -1,12 +1,9 @@
-package com.example.mbudget.ui
+package com.example.mbudget.ui.components
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
 import com.example.mbudget.model.*
 import org.junit.Rule
 import org.junit.Test
@@ -14,9 +11,6 @@ import java.time.Instant
 import java.util.*
 import kotlin.text.Typography.nbsp
 
-/**
- * CAVEAT! These tests are executed on device, so device locale ca
- */
 class ExpenseRowTest {
 
     @get:Rule

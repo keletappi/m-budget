@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">M\'Budget</string>
+    <string name="error_budget_limit_not_numeric">Budget limit can be whole numbers only</string>
+    <string name="budget_limit_placeholder">Budgeted amount</string>
+    <string name="budget_name_placeholder">Give the budget a name</string>
+    <string name="no_budgets_prompt">Alas, m\'budgets are not set up! Let\'s get cracking with the create budget button.</string>
 </resources>

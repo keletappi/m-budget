@@ -14,10 +14,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.mbudget.model.Budget
 import com.example.mbudget.model.Currency
 import com.example.mbudget.model.EUR
 import com.example.mbudget.ui.util.formattedAs
 import java.math.BigDecimal
+
+@Composable
+fun BudgetHeader(
+    budget: Budget,
+    modifier: Modifier = Modifier,
+) {
+    BudgetHeader(
+        name = budget.name,
+        used = budget.used,
+        limit = budget.limit,
+        currency = budget.currency,
+        modifier = modifier
+    )
+}
 
 @Composable
 fun BudgetHeader(
