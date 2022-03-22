@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.example.mbudget.model
 
 val EUR = Currency("EUR", "€")
