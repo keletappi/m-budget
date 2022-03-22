@@ -1,17 +1,18 @@
 package com.example.mbudget.ui.budget
 
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -24,7 +25,12 @@ import com.example.mbudget.model.Budget
 import com.example.mbudget.model.Currency
 import com.example.mbudget.model.Expense
 import com.example.mbudget.ui.util.formattedAsDigit
+import com.example.mbudget.ui.util.localTimeFormatted
 import com.example.mbudget.ui.validation.isValidDigit
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
+import java.time.*
 
 @Composable
 fun DefineExpenseSheetContent(
@@ -52,6 +58,12 @@ fun DefineExpenseSheetContent(
         mutableStateOf(baseExpense?.amount?.currency ?: budget.currency)
     }
 
+    val (time, setTime) = remember(contentKey, baseExpense) {
+        mutableStateOf(baseExpense?.time?.let {
+            LocalDateTime.ofInstant(it, ZoneId.systemDefault())
+        } ?: LocalDateTime.now())
+    }
+
     val amountIsValid by derivedStateOf { amount.text.trim().isValidDigit() }
 
     val canSaveExpense = name.text.isNotEmpty() && amount.text.isNotEmpty() && amountIsValid
@@ -77,6 +89,10 @@ fun DefineExpenseSheetContent(
             onNext = focusNextElement,
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        DateTimePicker(time, setTime)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         SaveExpenseButton(
@@ -89,13 +105,61 @@ fun DefineExpenseSheetContent(
                 )
                 saveExpenseAction(
                     baseExpense
-                        ?.copy(name = name.text, amount = newAmount)
-                        ?: Expense(name = newName, amount = newAmount)
+                        ?.copy(
+                            name = newName,
+                            amount = newAmount,
+                            time = time.atZone(ZoneId.systemDefault()).toInstant()
+                        )
+                        ?: Expense(
+                            name = newName,
+                            amount = newAmount,
+                            time = time.atZone(ZoneId.systemDefault()).toInstant()
+                        )
                 )
             },
             enabled = canSaveExpense
         )
     }
+}
+
+@Composable
+private fun DateTimePicker(time: LocalDateTime, setTime: (LocalDateTime) -> Unit) {
+    val activity = LocalContext.current as AppCompatActivity
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(2.dp, color = MaterialTheme.colors.onSurface),
+        onClick = {
+            showDatePicker(
+                activity = activity,
+                date = time.toLocalDate(),
+                setDate = { newDate ->
+                    showTimePicker(
+                        activity = activity,
+                        time = time.toLocalTime(),
+                        setTime = { newTime ->
+                            setTime(
+                                LocalDateTime.of(
+                                    newDate.year,
+                                    newDate.month,
+                                    newDate.dayOfMonth,
+                                    newTime.hour,
+                                    newTime.minute,
+                                )
+                            )
+                        }
+                    )
+                }
+            )
+        }
+    ) {
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = time.localTimeFormatted()
+        )
+    }
+
 }
 
 @Composable
@@ -134,7 +198,7 @@ fun AmountInput(
                     .weight(1f)
                     .alignByBaseline(),
                 value = amount,
-                placeholder = { Text(text = stringResource(R.string.create_budget_limit_placeholder)) },
+                placeholder = { Text(text = stringResource(R.string.create_expense_amount_placeholder)) },
                 onValueChange = { setAmount(it.copy(text = it.text.trim())) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -172,5 +236,38 @@ private fun SaveExpenseButton(
         enabled = enabled,
     ) {
         Text(stringResource(R.string.button_label_save_expense))
+    }
+}
+
+fun showDatePicker(
+    activity: AppCompatActivity,
+    date: LocalDate,
+    setDate: (LocalDate) -> Unit,
+) {
+    val picker = MaterialDatePicker.Builder.datePicker()
+        .setSelection(date.atTime(12, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
+        .build()
+
+    picker.show(activity.supportFragmentManager, picker.toString())
+    picker.addOnPositiveButtonClickListener {
+        val localDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault());
+        setDate(localDate.toLocalDate())
+    }
+}
+
+fun showTimePicker(
+    activity: AppCompatActivity,
+    time: LocalTime,
+    setTime: (LocalTime) -> Unit,
+) {
+    val picker = MaterialTimePicker.Builder()
+        .setHour(time.hour)
+        .setMinute(time.minute)
+        .setInputMode(INPUT_MODE_CLOCK)
+        .build()
+
+    picker.show(activity.supportFragmentManager, picker.toString())
+    picker.addOnPositiveButtonClickListener {
+        setTime(LocalTime.of(picker.hour, picker.minute))
     }
 }
