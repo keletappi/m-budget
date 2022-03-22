@@ -22,7 +22,7 @@ fun ExpenseListing(
     budgetCurrency: Currency,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier, contentPadding = PaddingValues(bottom = 48.dp)) {
+    LazyColumn(modifier = modifier, contentPadding = PaddingValues(bottom = 64.dp)) {
         items(expenses) { expense ->
             ExpenseRow(
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
