@@ -23,13 +23,15 @@ import com.example.mbudget.model.Amount
 import com.example.mbudget.model.Budget
 import com.example.mbudget.model.Currency
 import com.example.mbudget.model.Expense
+import com.example.mbudget.ui.util.formattedAsDigit
 import com.example.mbudget.ui.validation.isValidDigit
 
 @Composable
-fun CreateExpenseSheetContent(
+fun DefineExpenseSheetContent(
     budget: Budget,
-    createExpenseAction: (Expense) -> Unit = {},
+    saveExpenseAction: (Expense) -> Unit = {},
     contentKey: Any = Any(),
+    baseExpense: Expense?,
 ) {
     val focusManager = LocalFocusManager.current
     val focusNextElement = {
@@ -38,13 +40,21 @@ fun CreateExpenseSheetContent(
         }
     }
 
-    val (name, setName) = remember(contentKey) { mutableStateOf(TextFieldValue("")) }
-    val (amount, setAmount) = remember(contentKey) { mutableStateOf(TextFieldValue("")) }
-    val (currency, setCurrency) = remember(contentKey) { mutableStateOf(budget.currency) }
+    val (name, setName) = remember(contentKey, baseExpense) {
+        mutableStateOf(TextFieldValue(baseExpense?.name ?: ""))
+    }
+
+    val (amount, setAmount) = remember(contentKey, baseExpense) {
+        mutableStateOf(TextFieldValue(baseExpense?.amount?.formattedAsDigit() ?: ""))
+    }
+
+    val (currency, setCurrency) = remember(contentKey, baseExpense) {
+        mutableStateOf(baseExpense?.amount?.currency ?: budget.currency)
+    }
 
     val amountIsValid by derivedStateOf { amount.text.trim().isValidDigit() }
 
-    val canCreateExpense = name.text.isNotEmpty() && amount.text.isNotEmpty() && amountIsValid
+    val canSaveExpense = name.text.isNotEmpty() && amount.text.isNotEmpty() && amountIsValid
 
     Column(
         modifier = Modifier
@@ -69,17 +79,21 @@ fun CreateExpenseSheetContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        CreateExpenseButton(
+        SaveExpenseButton(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            createExpense = {
-                createExpenseAction(
-                    Expense(
-                        name = name.text,
-                        amount = Amount(amount.text.trim().toBigDecimal(), currency),
-                    )
+            saveExpenseAction = {
+                val newName = name.text
+                val newAmount = Amount(
+                    amount.text.trim().replace(',', '.').toBigDecimal(),
+                    currency
+                )
+                saveExpenseAction(
+                    baseExpense
+                        ?.copy(name = name.text, amount = newAmount)
+                        ?: Expense(name = newName, amount = newAmount)
                 )
             },
-            enabled = canCreateExpense
+            enabled = canSaveExpense
         )
     }
 }
@@ -116,7 +130,9 @@ fun AmountInput(
     Column {
         Row {
             TextField(
-                modifier = Modifier.weight(1f).alignByBaseline(),
+                modifier = Modifier
+                    .weight(1f)
+                    .alignByBaseline(),
                 value = amount,
                 placeholder = { Text(text = stringResource(R.string.create_budget_limit_placeholder)) },
                 onValueChange = { setAmount(it.copy(text = it.text.trim())) },
@@ -145,16 +161,16 @@ fun AmountInput(
 }
 
 @Composable
-private fun CreateExpenseButton(
+private fun SaveExpenseButton(
     modifier: Modifier = Modifier,
-    createExpense: () -> Unit,
+    saveExpenseAction: () -> Unit,
     enabled: Boolean
 ) {
     TextButton(
         modifier = modifier,
-        onClick = createExpense,
+        onClick = saveExpenseAction,
         enabled = enabled,
     ) {
-        Text(stringResource(R.string.button_label_create_expense))
+        Text(stringResource(R.string.button_label_save_expense))
     }
 }

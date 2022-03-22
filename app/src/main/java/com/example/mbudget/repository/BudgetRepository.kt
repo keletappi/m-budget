@@ -34,7 +34,7 @@ class BudgetRepository @Inject constructor(private val dao: BudgetDao) {
         )
     }
 
-    suspend fun addExpenseToBudget(expense: Expense, budgetId: UUID) {
+    suspend fun saveExpenseToBudget(expense: Expense, budgetId: UUID) {
         dao.insertOrUpdateExpense(
             DbExpense(
                 budgetId = budgetId,

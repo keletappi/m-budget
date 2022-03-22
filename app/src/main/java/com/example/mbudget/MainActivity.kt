@@ -4,11 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -76,6 +74,6 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 fun BudgetScreen(viewModel: BudgetViewModel) {
     com.example.mbudget.ui.budget.BudgetScreen(
         budget = viewModel.budget.observeAsState().value,
-        createExpense = viewModel::addExpense
+        saveExpense = viewModel::saveExpense
     )
 }

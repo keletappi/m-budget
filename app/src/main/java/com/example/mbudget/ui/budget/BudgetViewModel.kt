@@ -21,9 +21,9 @@ class BudgetViewModel @Inject constructor(
         budget.copy(expenses = budget.expenses.sortedBy { expense -> expense.time })
     }
 
-    fun addExpense(expense: Expense) {
+    fun saveExpense(expense: Expense) {
         viewModelScope.launch {
-            repository.addExpenseToBudget(expense, budgetId)
+            repository.saveExpenseToBudget(expense, budgetId)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.mbudget.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,12 +21,15 @@ import java.time.Instant
 fun ExpenseListing(
     expenses: List<Expense>,
     budgetCurrency: Currency,
+    onExpenseClicked: (Expense) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier, contentPadding = PaddingValues(bottom = 96.dp)) {
         items(expenses) { expense ->
             ExpenseRow(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
+                    .clickable { onExpenseClicked(expense) },
                 expense = expense,
                 budgetCurrency = budgetCurrency
             )
@@ -41,7 +45,8 @@ fun PreviewExpenseListing() {
             modifier = Modifier.fillMaxSize(),
             expenses = PREVIEW_EXPENSES,
             budgetCurrency = EUR,
-        )
+            onExpenseClicked = {}
+            )
     }
 }
 

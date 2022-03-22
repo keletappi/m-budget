@@ -17,7 +17,7 @@ import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.AMOUNT_BUDG
 import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.AMOUNT_ORIGINAL_CURRENCY
 import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.NAME
 import com.example.mbudget.ui.components.ExpenseRowSemantics.TestTag.TIME
-import com.example.mbudget.ui.util.formatted
+import com.example.mbudget.ui.util.formattedAsCurrency
 import com.example.mbudget.ui.util.localTimeFormatted
 import java.time.Instant
 import java.time.LocalDateTime
@@ -49,12 +49,12 @@ fun ExpenseRow(
         Column {
             Text(
                 modifier = Modifier.semantics { testTag = AMOUNT_BUDGET_CURRENCY },
-                text = expense.amountIn(budgetCurrency).formatted()
+                text = expense.amountIn(budgetCurrency).formattedAsCurrency()
             )
             if (expense.amount.currency != budgetCurrency) {
                 Text(
                     modifier = Modifier.semantics { testTag = AMOUNT_ORIGINAL_CURRENCY },
-                    text = expense.amount.formatted(),
+                    text = expense.amount.formattedAsCurrency(),
                     style = MaterialTheme.typography.body1.copy(fontSize = 10.sp)
                 )
             }

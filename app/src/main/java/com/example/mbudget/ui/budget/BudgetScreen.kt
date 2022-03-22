@@ -25,17 +25,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun BudgetScreen(
     budget: Budget?,
-    createExpense: (Expense) -> Unit,
+    saveExpense: (Expense) -> Unit,
 ) {
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val sheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
-    var createExpenseSheetContentKey by remember { mutableStateOf(Any()) }
+    var expenseSheetContentKey by remember { mutableStateOf(Any()) }
 
     BackHandler(enabled = sheetState.isVisible) {
         coroutineScope.launch { sheetState.hide() }
     }
+
+    val (editableExpense, setEditableExpense) = remember { mutableStateOf<Expense?>(null) }
 
     if (budget == null) {
         LoadingScreen()
@@ -44,24 +46,31 @@ fun BudgetScreen(
             ModalBottomSheetLayout(
                 sheetState = sheetState,
                 sheetContent = {
-                    CreateExpenseSheetContent(
+                    DefineExpenseSheetContent(
                         budget = budget,
-                        createExpenseAction = {
+                        baseExpense = editableExpense,
+                        saveExpenseAction = {
                             coroutineScope.launch { sheetState.hide() }
-                            createExpense(it)
+                            saveExpense(it)
                             softwareKeyboardController?.hide()
                         },
-                        contentKey = createExpenseSheetContentKey
+                        contentKey = expenseSheetContentKey
                     )
                 }) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    BudgetScreenContent(budget)
+                    BudgetScreenContent(budget,
+                        onExpenseClicked = {
+                            coroutineScope.launch { sheetState.show() }
+                            setEditableExpense(it)
+                        }
+                    )
                     FloatingActionButton(
                         modifier = Modifier
                             .padding(24.dp)
                             .align(Alignment.BottomEnd),
                         onClick = {
-                            createExpenseSheetContentKey = Any()
+                            setEditableExpense(null)
+                            expenseSheetContentKey = Any()
                             coroutineScope.launch { sheetState.toggle() }
                         }) {
                         // Set new key when sheet is opened to clear old content
@@ -78,7 +87,10 @@ fun BudgetScreen(
 }
 
 @Composable
-private fun BudgetScreenContent(budget: Budget) {
+private fun BudgetScreenContent(
+    budget: Budget,
+    onExpenseClicked: (Expense) -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         BudgetHeader(
             modifier = Modifier
@@ -101,6 +113,7 @@ private fun BudgetScreenContent(budget: Budget) {
             expenses = budget.expenses,
             budgetCurrency = budget.currency,
             modifier = Modifier.weight(1.0f),
+            onExpenseClicked = onExpenseClicked,
         )
     }
 }
@@ -116,7 +129,7 @@ fun PreviewBudget() {
                 currency = EUR,
                 expenses = PREVIEW_EXPENSES,
             ),
-            createExpense = {}
+            saveExpense = {}
         )
     }
 }
