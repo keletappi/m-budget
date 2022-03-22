@@ -8,7 +8,7 @@ data class Budget(
     val currency: Currency,
     val expenses: List<Expense>,
 ) {
-    val total: BigDecimal by lazy {
+    val used: BigDecimal by lazy {
         expenses.sumOf { it.amountIn(currency).amount }
     }
 }

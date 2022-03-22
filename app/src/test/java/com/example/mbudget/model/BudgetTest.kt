@@ -1,8 +1,6 @@
 package com.example.mbudget.model
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.*
-import org.junit.Assert.*
 
 import org.junit.Test
 import java.time.Instant
@@ -18,7 +16,7 @@ class BudgetTest {
             expenses = emptyList()
         )
 
-        assertThat(budget.total).isEqualToIgnoringScale(0)
+        assertThat(budget.used).isEqualToIgnoringScale(0)
     }
 
     @Test
@@ -41,7 +39,7 @@ class BudgetTest {
             )
         )
 
-        assertThat(budget.total).isEqualToIgnoringScale(10)
+        assertThat(budget.used).isEqualToIgnoringScale(10)
     }
 
     @Test
@@ -65,6 +63,6 @@ class BudgetTest {
             )
         )
 
-        assertThat(budget.total).isEqualToIgnoringScale(10)
+        assertThat(budget.used).isEqualToIgnoringScale(10)
     }
 }

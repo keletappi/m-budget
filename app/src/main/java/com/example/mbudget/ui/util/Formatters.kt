@@ -15,6 +15,14 @@ fun Amount.formatted(): String {
     return format.format(amount)
 }
 
+fun Number.formattedAs(currency: com.example.mbudget.model.Currency): String {
+    val format: NumberFormat = NumberFormat.getCurrencyInstance()
+    format.currency = Currency.getInstance(currency.id)
+    format.minimumFractionDigits = 2
+    format.maximumFractionDigits = 2
+    return format.format(this)
+}
+
 fun Temporal.localTimeFormatted(): String {
     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         .format(this)
