@@ -33,3 +33,8 @@ fun Temporal.localTimeFormatted(): String {
     return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
         .format(this)
 }
+
+fun Temporal.yearMonthFormatted(): String {
+    return DateTimeFormatter.ofPattern("MMMM y")
+        .format(this)
+}

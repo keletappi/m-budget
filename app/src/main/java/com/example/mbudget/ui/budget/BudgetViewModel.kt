@@ -18,20 +18,28 @@ class BudgetViewModel @Inject constructor(
 
     val budgetId: UUID = UUID.fromString(savedStateHandle["budgetId"])
 
-    // TODO: Make month selectable
     @Suppress("MemberVisibilityCanBePrivate")
-    val month = MutableLiveData(YearMonth.now())
+    val selectedYearMonth = MutableLiveData(YearMonth.now())
 
-    val budget: LiveData<Budget> = month.switchMap { selectedMonth ->
-            repository.getBudget(budgetId, selectedMonth).asLiveData().map { budget ->
-                budget.copy(expenses = budget.expenses.sortedBy { expense -> expense.time })
-            }
+    val budget: LiveData<Budget> = selectedYearMonth.switchMap { selectedMonth ->
+        // TODO: Show loading indicator while data is being refreshed
+        repository.getBudget(budgetId, selectedMonth).asLiveData().map { budget ->
+            budget.copy(expenses = budget.expenses.sortedBy { expense -> expense.time })
         }
+    }
 
     fun saveExpense(expense: Expense) {
         viewModelScope.launch {
             repository.saveExpenseToBudget(expense, budgetId)
         }
+    }
+
+    fun nextMonth() {
+        selectedYearMonth.value = selectedYearMonth.value?.plusMonths(1)?.coerceAtMost(YearMonth.now()) ?: YearMonth.now()
+    }
+
+    fun previousMonth() {
+        selectedYearMonth.value = selectedYearMonth.value?.minusMonths(1) ?: YearMonth.now()
     }
 
 }

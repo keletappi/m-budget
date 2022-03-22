@@ -6,6 +6,7 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -15,8 +16,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mbudget.ui.budget.BudgetViewModel
+import com.example.mbudget.ui.budget.MonthSelection
 import com.example.mbudget.ui.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.YearMonth
 import java.util.*
 
 @AndroidEntryPoint
@@ -74,6 +77,13 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 fun BudgetScreen(viewModel: BudgetViewModel) {
     com.example.mbudget.ui.budget.BudgetScreen(
         budget = viewModel.budget.observeAsState().value,
-        saveExpense = viewModel::saveExpense
+        saveExpenseAction = viewModel::saveExpense,
+        monthSelection = viewModel.selectedYearMonth.observeAsState(YearMonth.now()).value.let {
+            MonthSelection(
+                selectedMonth = it,
+                next = viewModel::nextMonth,
+                previous = viewModel::previousMonth,
+            )
+        }
     )
 }

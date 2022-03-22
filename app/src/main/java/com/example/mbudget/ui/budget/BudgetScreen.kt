@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mbudget.model.Budget
@@ -20,12 +23,21 @@ import com.example.mbudget.ui.components.ExpenseListing
 import com.example.mbudget.ui.components.PREVIEW_EXPENSES
 import com.example.mbudget.ui.home.LoadingScreen
 import com.example.mbudget.ui.home.toggle
+import com.example.mbudget.ui.util.yearMonthFormatted
 import kotlinx.coroutines.launch
+import java.time.YearMonth
+
+data class MonthSelection(
+    val selectedMonth: YearMonth,
+    val next: () -> Unit,
+    val previous: () -> Unit
+)
 
 @Composable
 fun BudgetScreen(
     budget: Budget?,
-    saveExpense: (Expense) -> Unit,
+    saveExpenseAction: (Expense) -> Unit,
+    monthSelection: MonthSelection,
 ) {
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val sheetState =
@@ -51,18 +63,20 @@ fun BudgetScreen(
                         baseExpense = editableExpense,
                         saveExpenseAction = {
                             coroutineScope.launch { sheetState.hide() }
-                            saveExpense(it)
+                            saveExpenseAction(it)
                             softwareKeyboardController?.hide()
                         },
                         contentKey = expenseSheetContentKey
                     )
                 }) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    BudgetScreenContent(budget,
+                    BudgetScreenContent(
+                        budget,
                         onExpenseClicked = {
                             coroutineScope.launch { sheetState.show() }
                             setEditableExpense(it)
-                        }
+                        },
+                        monthSelection = monthSelection
                     )
                     FloatingActionButton(
                         modifier = Modifier
@@ -89,9 +103,17 @@ fun BudgetScreen(
 @Composable
 private fun BudgetScreenContent(
     budget: Budget,
-    onExpenseClicked: (Expense) -> Unit
+    onExpenseClicked: (Expense) -> Unit,
+    monthSelection: MonthSelection
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
+        MonthSelector(
+            modifier = Modifier.fillMaxWidth(),
+            selectedMonth = monthSelection.selectedMonth,
+            selectNextMonth = monthSelection.next,
+            selectPreviousMonth = monthSelection.previous,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
         BudgetHeader(
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,17 +141,56 @@ private fun BudgetScreenContent(
 }
 
 @Composable
-@Preview(widthDp = 320, heightDp = 500)
-fun PreviewBudget() {
+fun MonthSelector(
+    selectedMonth: YearMonth,
+    selectNextMonth: () -> Unit,
+    selectPreviousMonth: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = selectPreviousMonth) {
+            Icon(Icons.Filled.SkipPrevious, contentDescription = null)
+        }
+
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .weight(1f),
+            text = selectedMonth.yearMonthFormatted(),
+            textAlign = TextAlign.Center,
+        )
+
+        IconButton(onClick = selectNextMonth) {
+            Icon(Icons.Filled.SkipNext, contentDescription = null)
+        }
+
+    }
+}
+
+
+@Composable
+@Preview(widthDp = 320)
+fun PreviewMonthSelector() {
     MaterialTheme {
-        BudgetScreen(
-            budget = Budget(
-                name = "Preview Budget",
-                limit = 120.toBigDecimal(),
-                currency = EUR,
-                expenses = PREVIEW_EXPENSES,
-            ),
-            saveExpense = {}
+        MonthSelector(
+            selectedMonth = YearMonth.now(),
+            selectNextMonth = { },
+            selectPreviousMonth = { },
+        )
+    }
+}
+
+@Composable
+@Preview(widthDp = 320, heightDp = 500)
+fun PreviewExpenseListing() {
+    MaterialTheme {
+        ExpenseListing(
+            expenses = PREVIEW_EXPENSES,
+            budgetCurrency = EUR,
+            onExpenseClicked = {}
         )
     }
 }
