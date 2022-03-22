@@ -8,7 +8,7 @@ class ExpenseTest {
 
     @Test
     fun amountInSameCurrency() {
-        val currency = Currency("EUR", "€")
+        val currency = EUR
 
         val original = Expense(
             name = "Foobar",

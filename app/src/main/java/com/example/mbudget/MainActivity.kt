@@ -66,8 +66,9 @@ fun NavigationGraph() {
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
     com.example.mbudget.ui.home.HomeScreen(
         budgets = viewModel.budgets.observeAsState().value,
-        createBudget = viewModel::createBudget
-    ) { budgetId: UUID -> navController.navigate(route = "budget/$budgetId") }
+        createBudget = viewModel::createBudget,
+        openBudget = { budgetId: UUID -> navController.navigate(route = "budget/$budgetId") }
+    )
 }
 
 
@@ -75,5 +76,6 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 fun BudgetScreen(viewModel: BudgetViewModel) {
     com.example.mbudget.ui.budget.BudgetScreen(
         budget = viewModel.budget.observeAsState().value,
+        createExpense = viewModel::addExpense
     )
 }

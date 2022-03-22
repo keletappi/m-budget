@@ -45,6 +45,7 @@ fun BudgetScreen(
                 sheetState = sheetState,
                 sheetContent = {
                     CreateExpenseSheetContent(
+                        budget = budget,
                         createExpenseAction = {
                             coroutineScope.launch { sheetState.hide() }
                             createExpense(it)
@@ -53,33 +54,27 @@ fun BudgetScreen(
                         contentKey = createExpenseSheetContentKey
                     )
                 }) {
-                BudgetScreenContent(budget)
-            }
+                Box(modifier = Modifier.fillMaxSize()) {
+                    BudgetScreenContent(budget)
+                    FloatingActionButton(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .align(Alignment.BottomEnd),
+                        onClick = {
+                            createExpenseSheetContentKey = Any()
+                            coroutineScope.launch { sheetState.toggle() }
+                        }) {
+                        // Set new key when sheet is opened to clear old content
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null
+                        )
+                    }
 
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .align(Alignment.BottomEnd),
-                onClick = {
-                    createExpenseSheetContentKey = Any()
-                    coroutineScope.launch { sheetState.toggle() }
-                }) {
-                // Set new key when sheet is opened to clear old content
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null
-                )
+                }
             }
         }
     }
-}
-
-@Composable
-fun CreateExpenseSheetContent(
-    createExpenseAction: (Expense) -> Unit,
-    contentKey: Any
-) {
-    TODO("Not yet implemented")
 }
 
 @Composable
@@ -119,8 +114,9 @@ fun PreviewBudget() {
                 name = "Preview Budget",
                 limit = 120.toBigDecimal(),
                 currency = EUR,
-                expenses = PREVIEW_EXPENSES
-            )
+                expenses = PREVIEW_EXPENSES,
+            ),
+            createExpense = {}
         )
     }
 }

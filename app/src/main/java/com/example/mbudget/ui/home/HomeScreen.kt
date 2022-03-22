@@ -61,14 +61,12 @@ fun HomeScreen(
 
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
             HomeScreenContent(budgets, openBudget)
             FloatingActionButton(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(24.dp)
                     .align(Alignment.BottomEnd),
                 onClick = {
                     createBudgetSheetContentKey = Any()
@@ -84,114 +82,6 @@ fun HomeScreen(
     }
 }
 
-@Composable
-@Preview
-fun CreateBudgetSheetContent(
-    createBudgetAction: (CreateBudgetInfo) -> Unit = {},
-    contentKey: Any = Any()
-) {
-    val focusManager = LocalFocusManager.current
-    val focusNextElement = {
-        if (!focusManager.moveFocus(FocusDirection.Next)) {
-            focusManager.moveFocus(FocusDirection.Down)
-        }
-    }
-
-    val (name, setName) = remember(contentKey) { mutableStateOf(TextFieldValue("")) }
-    val (limit, setLimit) = remember(contentKey) { mutableStateOf(TextFieldValue("")) }
-
-    // FIXME: This now supports whole numbers only. Accept single decimal separator as well
-    val limitHasError by derivedStateOf { !limit.text.isDigitsOnly() }
-
-    val canCreateBudget = name.text.isNotEmpty() && limit.text.isNotEmpty() && !limitHasError
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 32.dp)
-    ) {
-        NameInput(
-            name = name,
-            setName = setName,
-            onNext = focusNextElement,
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LimitInput(
-            limit = limit,
-            setLimit = setLimit,
-            limitHasError = limitHasError,
-            onNext = focusNextElement,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        CreateBudgetButton(
-            modifier = Modifier.align(CenterHorizontally),
-            createBudget = { createBudgetAction(CreateBudgetInfo(name.text, limit.text.toBigDecimal())) },
-            enabled = canCreateBudget,
-        )
-    }
-}
-
-@Composable
-private fun CreateBudgetButton(
-    modifier: Modifier = Modifier,
-    createBudget: () -> Unit,
-    enabled: Boolean
-) {
-    TextButton(
-        modifier = modifier,
-        onClick = createBudget,
-        enabled = enabled,
-    ) {
-        Text("Create budget")
-    }
-}
-
-
-@Composable
-private fun NameInput(
-    name: TextFieldValue,
-    setName: (TextFieldValue) -> Unit,
-    onNext: () -> Unit,
-) {
-    TextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = name,
-        placeholder = { Text(text = stringResource(R.string.budget_name_placeholder)) },
-        onValueChange = setName,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        keyboardActions = KeyboardActions(onNext = { onNext() }),
-        maxLines = 1,
-    )
-}
-
-@Composable
-private fun LimitInput(
-    limit: TextFieldValue,
-    setLimit: (TextFieldValue) -> Unit,
-    limitHasError: Boolean,
-    onNext: () -> Unit,
-) {
-    Column {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = limit,
-            placeholder = { Text(text = stringResource(R.string.budget_limit_placeholder)) },
-            onValueChange = setLimit,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions(onNext = { onNext() }),
-            isError = limitHasError
-        )
-
-        Text(
-            text = stringResource(R.string.error_budget_limit_not_numeric),
-            color = if (limitHasError) MaterialTheme.colors.onBackground else Color.Transparent
-        )
-    }
-}
 
 @Composable
 private fun HomeScreenContent(
